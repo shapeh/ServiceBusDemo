@@ -1,0 +1,35 @@
+﻿@page "/"
+@using SBShared.Models
+@using SBSender.Services
+@inject IQueueService QueueService
+
+<PageTitle>Service Bus</PageTitle>
+
+<h1>Service Bus</h1>
+
+
+<EditForm Model="@person" OnValidSubmit="@PublishMessage">
+    <DataAnnotationsValidator />
+    <ValidationSummary/>
+
+    <div class="form-group">
+        <label for="firstName">First Name</label>
+        <InputText id="firstName" class="form-control" @bind-Value="person.FirstName"></InputText>
+    </div>
+
+    <div class="form-group">
+        <label for="lastName">Last Name</label>
+        <InputText id="lastName" class="form-control" @bind-Value="person.LastName"></InputText>
+    </div>
+    <button type="submit" class="btn btn-primary">Send</button>
+</EditForm>
+
+@code
+{
+    private readonly PersonModel person = new();
+
+    private async Task PublishMessage()
+    {
+        await QueueService.SendMessageAsync(person, "PersonQueue", CancellationToken.None);
+    }
+}
